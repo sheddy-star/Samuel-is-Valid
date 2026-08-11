@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Supermarket Checkout</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #071f5300;
+            color: #222;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: rgba(44, 93, 218, 0.827);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(34, 15, 14, 0.1);
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #11080100;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .item {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: rgb(5, 1, 13);
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #15089259;
+        }
+
+        .receipt {
+            border-top: 4px solid #eb2564;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1b7abe;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .items {
+            margin: 15px 0;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>🛒 Supermarket Checkout</h1>
+
+        <form method="POST">
+
+            <h2>Customer Information</h2>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Age</label>
+                <input
+                    type="number"
+                    name="age"
+                    placeholder="Enter your age"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Available Money</label>
+                <input
+                    type="number"
+                    name="money"
+                    step="0.01"
+                    placeholder="Enter your money"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Membership Status</label>
+
+                <select name="membership_status">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+
+            <h2>🛍️ Grocery Items</h2>
+
+            {% for i in range(1, 5) %}
+
+            <div class="item">
+
+                <input
+                    type="text"
+                    name="item_name_{{ i }}"
+                    placeholder="Item {{ i }} name"
+                    required
+                >
+
+                <input
+                    type="number"
+                    name="item_price_{{ i }}"
+                    placeholder="Price"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+            {% endfor %}
+
+
+            <h2>➕ Additional Item</h2>
+
+            <div class="item">
+
+                <input
+                    type="text"
+                    name="extra_item_name"
+                    placeholder="Additional item"
+                    required
+                >
+
+                <input
+                    type="number"
+                    name="extra_item_price"
+                    placeholder="Price"
+                    step="0.01"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Generate Receipt
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {% if receipt %}
+
+    <div class="card receipt">
+
+        <h1>🧾 Customer Receipt</h1>
+
+        <div class="receipt-row">
+            <span>Customer Name (Upper)</span>
+            <strong>{{ receipt.name_uppercase }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Customer Name (Lower)</span>
+            <strong>{{ receipt.name_lowercase }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>First Name</span>
+            <strong>{{ receipt.first_name }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Name Character Count</span>
+            <strong>{{ receipt.name_char_count }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Customer ID</span>
+            <strong>{{ receipt.customer_id }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Age</span>
+            <strong>{{ receipt.age }}</strong>
+        </div>
+
+
+        <h2>Purchased Items</h2>
+
+        <div class="items">
+
+          {% for name, price in receipt["items"] %}
+
+            <div class="item-row">
+                <span>{{ name }}</span>
+                <strong>${{ "%.2f"|format(price) }}</strong>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="receipt-row">
+            <span>Removed Item</span>
+            <strong>{{ receipt.removed_item }}</strong>
+        </div>
+
+
+        <div class="receipt-row">
+            <span>Average Price</span>
+            <strong>${{ "%.2f"|format(receipt.average_price) }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Highest Price</span>
+            <strong>${{ "%.2f"|format(receipt.highest_price) }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Lowest Price</span>
+            <strong>${{ "%.2f"|format(receipt.lowest_price) }}</strong>
+        </div>
+
+        <div class="receipt-row">
+            <span>Discount</span>
+            <strong>{{ receipt.discount }}</strong>
+        </div>
+
+        <div class="receipt-row total">
+            <span>Total Cost</span>
+            <strong>${{ "%.2f"|format(receipt.total_cost) }}</strong>
+        </div>
+
+        <div class="receipt-row total">
+            <span>Remaining Money</span>
+            <strong>${{ "%.2f"|format(receipt.remaining_money) }}</strong>
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
